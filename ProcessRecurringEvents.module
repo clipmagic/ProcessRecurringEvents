@@ -2,6 +2,33 @@
 
 /* Module adapted from Mr Nice Guy's form post on December 5, 2015
  * at https://processwire.com/talk/topic/11613-create-virtual-pages-for-repeatingrecurring-events-in-an-event-calendar/
+ * 
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ * Or read it online: http://www.gnu.org/licenses/licenses.html *GPL
+ *
+ * 
+ * 
+ * @author Clip Magic
+ * 
+ * ProcessWire 3.x
+ * Copyright (C) 2011 by Ryan Cramer
+ * Licensed under GNU/GPL v2, see LICENSE.TXT
+ * 
+ * http://www.processwire.com
+ * http://www.ryancramer.com
+ * 
  */
 
 
@@ -15,9 +42,13 @@ class ProcessRecurringEvents extends WireData implements Module, ConfigurableMod
     public static function getModuleInfo() {
         return array(
             'title' => 'Recurring Events',
-            'summary' => 'Adds a function to create recurring events and add pages to Processwire when a checkbox is checked on page save',
-            'version' => 1,
+            'summary' => 'Adds a hook function to create recurring events and add/update pages to Processwire when a checkbox is checked on page save',
+            'version' => "0.0.1",
+            'author' => "Clip Magic",
+            'href' => "http://www.clipmagic.com.au",
             'autoload' => true,
+            'requires' => array("FieldtypeOptions", "FieldtypeCheckbox", "ProcessPageClone", "FieldtypeDatetime")  
+            
         );
     }
   
@@ -95,10 +126,7 @@ class ProcessRecurringEvents extends WireData implements Module, ConfigurableMod
         $f->value = $data['end_date'];
         $f->columnWidth = 50;
         $f->notes = __('Create FieldtypeDatetime field for the end date and add it to your Event detail template.');
-        $fieldset->add($f); 
-        
-        
-        
+        $fieldset->add($f);                       
         
         // Fieldset - Recurring event fields
         $fieldset = $modules->get("InputfieldFieldset");        
