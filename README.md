@@ -2,7 +2,7 @@
 
 
 ## General information
-This module enables you to automatically create pages based on a page template, eg Calender detail page that has calendar event recurrences.
+This module enables you to automatically create pages based on a ProcessWire page template, eg Calender detail page that has calendar event recurrences.
 
 ## Installation
 * Ensure you've installed the following Core Modules:
