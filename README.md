@@ -2,18 +2,17 @@
 
 
 ## General information
-This module enables you to automatically create pages based on a page template, eg Calender detail page that has recurrences.
-
-Should the originating page title be updated, the recurring event page titles will also be updated.
+This module enables you to automatically create pages based on a page template, eg Calender detail page that has calendar event recurrences.
 
 ## Installation
 * Ensure you've installed the following Core Modules:
-*	FieldtypeDatetime
-*  FieldtypeOptions
-*  FieldtypeCheckbox
-*  ProcessPageClone
+	*	FieldtypeDatetime
+	*  FieldtypeOptions
+	*  FieldtypeCheckbox
+	*  ProcessPageClone
 
-Download the zip file into your site/modules folder then expand the zip file. Next, login to ProcessWire > go to Modules > click "Refresh". You should see a note that a new module was found. Install the module. 
+* Download the zip file into your site/modules folder then expand the zip file. 
+* Next, login to ProcessWire > go to Modules > click "Refresh". You should see a note that a new module was found. Install the ProcessRecurringEvents module. 
 
 
 ## Usage
@@ -36,6 +35,9 @@ Strongly recommend that in your template text field for number of recurrences, y
 
 ### Basic usage
 The module autoloads and looks for the templates you've nominated in the module configuration. When it finds a page that has the chosen template & fields and the checkbox field you created for 'Recurring' checkbox ticked, the magic happens.
+
+Once the recurrence pages are created, they're just pages. You can edit, unpublish, etc as you wish. The only thing to note is that should the originating page title be updated, the recurring event page titles will also be updated to match.
+
 
 
 ## Change log
