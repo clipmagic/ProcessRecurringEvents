@@ -217,7 +217,7 @@ class ProcessRecurringEvents extends WireData implements Module, ConfigurableMod
   public function hookSave($event) {    
     $page = $event->arguments[0];
     
-    if (!in_array($page->template, $this->event_templates))
+    if (!in_array($page->template, $this->defaults['event_templates']))
         return;
     
         $fields = wire()->fields;
