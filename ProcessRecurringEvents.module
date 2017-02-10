@@ -1,0 +1,247 @@
+<?php 
+
+/* Module adapted from Mr Nice Guy's form post on December 5, 2015
+ * at https://processwire.com/talk/topic/11613-create-virtual-pages-for-repeatingrecurring-events-in-an-event-calendar/
+ */
+
+
+class ProcessRecurringEvents extends WireData implements Module, ConfigurableModule {
+    
+
+    #---------------------
+    # Module info
+    #---------------------  
+    
+    public static function getModuleInfo() {
+        return array(
+            'title' => 'Recurring Events',
+            'summary' => 'Adds a function to create recurring events and add pages to Processwire when a checkbox is checked on page save',
+            'version' => 1,
+            'autoload' => true,
+        );
+    }
+  
+    #---------------------
+    # Module config defaults
+    #---------------------      
+
+    public static function getDefaults() {
+        // Default template, etc
+        return array(
+            "event_templates" => array(), // array  - field for event detail templates
+            "start_date" => "",           // string - field for start date datetime
+            "end_date" => "",             // string - field for end date datetime
+            "recurring" => "",            // string - field for recurring checkbox
+            "recurrences" => "",          // string - field for number of recurrences
+            "interval" => "",             // string - field for number of recurrences
+            "max_recurrences" => 0        // int    - maximum number of allowed recurrences
+         );
+    }
+
+  
+     public static function getModuleConfigInputfields(array $data) {
+        
+        $modules = wire('modules');
+        $fields = wire('fields');
+        
+        $tmpTemplates = wire('templates');
+        foreach($tmpTemplates as $template) { // exclude system fields
+            if($template->flags & Template::flagSystem) continue;
+            $templates[] = $template;
+        }
+        
+        $form = new InputfieldWrapper();
+
+        $defaults = self::getDefaults();
+        $data = array_merge($defaults, $data);
+        
+        
+
+        // Select template for Event detail page
+        $f = $modules->get("InputfieldAsmSelect");
+        $f->name = "event_templates";
+        $f->label = __("Template(s) for the single event pages");
+        $f->description = __("Choose the template for the event detail page.");
+        foreach($templates as $template) $f->addOption($template->name);
+        $f->value = $data['event_templates'];
+        $f->notes = __('Choose the template you use for Calendar event details.');
+        $form->add($f);
+        
+        
+        // Fieldset - start and end date fields
+        $fieldset = $modules->get("InputfieldFieldset");        
+        $fieldset->name = "event_dates";
+        $fieldset->label = "Event Date fields";
+        $form->add($fieldset); 
+        
+        // Select the datetime field to for the event start date
+        $f = $modules->get('InputfieldSelect'); 
+        $f->attr('name', 'start_date'); 
+        $f->label = 'Datetime field for the start date of the Event';
+        $dtFields = $fields->find('type=FieldtypeDatetime');
+        foreach($dtFields as $txt) $f->addOption($txt->name);        
+        $f->value = $data['start_date'];
+        $f->columnWidth = 50;
+        $f->notes = __('Create FieldtypeDatetime field for the start date and add it to your Event detail template.');
+        $fieldset->add($f); 
+        
+        
+        // Select the datetime field to for the event end date
+        $f = $modules->get('InputfieldSelect'); 
+        $f->attr('name', 'end_date'); 
+        $f->label = 'Datetime field for the end date of the Event';
+        $dtFields = $fields->find('type=FieldtypeDatetime');
+        foreach($dtFields as $txt) $f->addOption($txt->name);        
+        $f->value = $data['end_date'];
+        $f->columnWidth = 50;
+        $f->notes = __('Create FieldtypeDatetime field for the end date and add it to your Event detail template.');
+        $fieldset->add($f); 
+        
+        
+        
+        
+        // Fieldset - Recurring event fields
+        $fieldset = $modules->get("InputfieldFieldset");        
+        $fieldset->name = "recurring_info";
+        $fieldset->label = "Recurring Event fields";
+        $form->add($fieldset); 
+        
+        // Select the checkbox field to be used to indicate the event is recurring
+        $f = $modules->get('InputfieldSelect'); 
+        $f->attr('name', 'recurring'); 
+        $f->label = 'Checkbox for Recurring Events';
+        $cbFields = $fields->find('type=FieldtypeCheckbox');
+        foreach($cbFields as $chbx) $f->addOption($chbx->name);        
+        $f->value = $data['recurring'];
+        $f->columnWidth = 25;
+        $f->notes = __('Create at least one FieldtypeCheckbox field and add it to your Event detail template');
+        $fieldset->add($f); 
+
+        // Select the text field to indicate the number of recurrences
+        $f = $modules->get('InputfieldSelect'); 
+        $f->attr('name', 'n_recurrences'); 
+        $f->label = 'Text field for the number of Event recurrences';
+        $cbFields = $fields->find('type=FieldtypeText');
+        foreach($cbFields as $txt) $f->addOption($txt->name);        
+        $f->value = $data['n_recurrences'];
+        $f->columnWidth = 25;
+        $f->notes = __('Create at least one FieldtypeText field and add it to your Event detail template. Strongly recommend adding pattern [0-9] and max length = 2');
+        $fieldset->add($f); 
+        
+               
+        // Max  number of recurrences
+        $f = $modules->get('InputfieldText'); 
+        $f->attr('name', 'max_recurrences'); 
+        $f->label = __('Maximum number of recurrences');
+        $f->value = $data['max_recurrences'] ? $data['max_recurrences'] : 20;
+        $f->columnWidth = 25;
+        $fieldset->add($f); 
+        
+        // Select the options field for the recurrence interval
+        $f = $modules->get('InputfieldSelect'); 
+        $f->attr('name', 'interval'); 
+        $f->label = 'Field for the recurrence interval';
+        $cbFields = $fields->find('type=FieldtypeSelect|FieldtypeCheckbox|FieldtypeOptions');
+        foreach($cbFields as $txt) $f->addOption($txt->name);        
+        $f->value = $data['interval'];
+        $f->notes = __('Create at least one single option type field - Select, Options or Checkbox for the interval with options: day, week, month, year');
+        $f->columnWidth = 25;
+        $fieldset->add($f); 
+        
+        return $form; 
+        
+    }
+  
+  
+
+    #---------------------
+    # Module init
+    #---------------------  
+  
+    public function __construct() {
+        $this->defaults = wire('modules')->getModuleConfigData('ProcessRecurringEvents'); 
+
+    }
+        
+    public function init() {
+        $this->pages->addHookAfter('save', $this, 'hookSave'); 
+    }
+
+
+    public function install() {
+        
+    }
+
+    public function uninstall() {
+        
+    }
+
+    public function ___ready() {
+
+    }
+
+    #---------------------
+    # Module functions
+    #---------------------   
+
+
+  
+  public function hookSave($event) {    
+    $page = $event->arguments[0];
+    
+    if (!in_array($page->template, $this->event_templates))
+        return;
+    
+        $fields = wire()->fields;
+        
+        $start_date     = $this->defaults['start_date'];
+        $end_date       = $this->defaults['end_date'];
+        $recurring      = $this->defaults['recurring'];
+        $interval       = $this->defaults['interval'];
+        $recurrences    = $this->defaults['n_recurrences'];
+        $maxRecurrences = $this->defaults['max_recurrences'];
+        
+    # confirm recurring is checked on the page being saved and the page is OK to clone   
+    if ($page->$recurring==1 && !$page->isUnpublished() && !$page->isTrash()) {
+
+        $pages = wire('pages');
+        
+        // ensure the number of recurrences does not exceed the maximum set in the module config
+        $page->$recurrences = $page->$recurrences <= $maxRecurrences ? $page->$recurrences : $maxRecurrences;
+        $intervalString = strtolower($page->$interval->title); // day, week, month, year
+
+            for ($i=1; $i <= $page->$recurrences; $i++) {
+                
+                // Dont create duplicate duplicates! Give new page name of original page name plus hyphen and number of $i
+                $renamed = $page->name . "-" . $i;
+                $np = $pages->get("name=$renamed");
+                if (!$np->name) {                    
+                    // preset field values for cloned page
+                    $options = array(
+                        'set' => array (
+                            $recurring => 0,
+                            'status' => $page->status
+                            )
+                    );
+                    
+                    $np = $pages->clone($page, $page->parent, true, $options);              
+                }
+                
+                // Now update the fields... inc removing the '(copy)' from the cloned page
+                $np->of(false);
+                $np->title = $page->title;
+                $np->status = $page->status;
+                $np->recurring = 0;
+                $nextInterval = '+'.$i.' '.$intervalString; // construct the $interval selector for strtotimestamp +1 week or +1day, increase with iteration by 1
+                $np->$start_date = strtotime($nextInterval, $page->$start_date);
+                // returns null/blank if no end_date in original page
+                $np->$end_date = strtotime($nextInterval, $page->$end_date);
+                $np->save();
+                unset($np);  // save memory  ???                                                 
+            }          
+            
+        $this->message("Sucessfully created/updated ".($i-1)." copies of recurring event {$page->title}");  
+      }
+  }
+  
+}?>
