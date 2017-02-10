@@ -8,13 +8,12 @@ Should the originating page title be updated, the recurring event page titles wi
 
 ## Installation
 * Ensure you've installed the following Core Modules:
-* 	- FieldtypeDatetime
-*  - FieldtypeOptions
-*  - FieldtypeCheckbox
-*  - ProcessPageClone
+*	FieldtypeDatetime
+*  FieldtypeOptions
+*  FieldtypeCheckbox
+*  ProcessPageClone
 
-* Download the zip file into your site/modules folder then expand the zip file
-* Login to ProcessWire > go to Modules > click "Refresh". You should see a note that a new module was found. Install the module. 
+Download the zip file into your site/modules folder then expand the zip file. Next, login to ProcessWire > go to Modules > click "Refresh". You should see a note that a new module was found. Install the module. 
 
 
 ## Usage
@@ -22,6 +21,7 @@ Should the originating page title be updated, the recurring event page titles wi
 * Event start date as type Datetime
 * Event end date as type Datetime
 * Event Recurring as type Checkbox
+* Event number of recurrences as type Text
 * Event Interval as type Options - use the PHP time intervals, eg Day, Week, Month, as the single choice options
 
 ### Update your template(s)
