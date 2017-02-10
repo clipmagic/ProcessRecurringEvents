@@ -12,7 +12,7 @@ Should the originating page title be updated, the recurring event page titles wi
 *  - FieldtypeOptions
 *  - FieldtypeCheckbox
 *  - ProcessPageClone
-*  
+
 * Download the zip file into your site/modules folder then expand the zip file
 * Login to ProcessWire > go to Modules > click "Refresh". You should see a note that a new module was found. Install the module. 
 
@@ -28,7 +28,7 @@ Should the originating page title be updated, the recurring event page titles wi
 Add your new fields to your chosen templates(s)
 
 ### Configure the module
-This module does not automatically create new fields. Instead, you create the fields, or use ones you're already using in your templates, then match them to the fields needed by this module.
+This module does not automatically create new fields. Instead, you create the fields, or apply ones you're already using in your templates, then match them to the fields needed by this module.
 
 The only field you don't need to create in the module configuration is the Maximum Number of Recurrences. It's just a safeguard so that should an admin save a stupid number in the Event Detail template, this number will override the page number of recurrences.
 
