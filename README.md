@@ -27,7 +27,7 @@ This module enables you to automatically create pages based on a ProcessWire pag
 Add your new fields to your chosen templates(s)
 
 ### Configure the module
-This module does not automatically create new fields. Instead, you create the fields, or apply ones you're already using in your templates, then match them to the fields needed by this module.
+This module does not automatically create new fields. Instead, you create the fields, or apply ones you're already using in your templates, then map them to the fields needed by this module.
 
 The only field you don't need to create in the module configuration is the Maximum Number of Recurrences. It's just a safeguard so that should an admin save a stupid number in the Event Detail template, this number will override the page number of recurrences.
 
